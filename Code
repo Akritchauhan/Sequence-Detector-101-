@@ -1,1 +1,45 @@
+`timescale 1ns / 1ps
 
+module sequence_detector (
+    input clk,
+    input rst,
+    input din,
+    output reg dout
+);
+    parameter s0 = 0;
+    parameter s1 = 1;
+    parameter s2 = 2;
+
+    reg [1:0] state;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            state <= s0;
+            dout <= 0;
+        end else begin
+            case (state)
+                s0: begin
+                    dout <= 0;
+                    if (din) state <= s1;
+                    else state <= s0;
+                end
+                
+                s1: begin
+                    dout <= 0;
+                    if (!din) state <= s2;
+                    else state <= s1;
+                end
+                
+                s2: begin
+                    if (din) begin
+                        state <= s1;
+                        dout <= 1;
+                    end else begin
+                        state <= s0;
+                        dout <= 0;
+                    end
+                end
+            endcase
+        end
+    end
+endmodule
